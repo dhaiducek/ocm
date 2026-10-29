@@ -40,9 +40,9 @@ var _ = Describe("switch-hub", Ordered, func() {
 	var spokeCancel context.CancelFunc
 
 	BeforeEach(func() {
-		features.SpokeMutableFeatureGate.SetFromMap(map[string]bool{
+		Expect(features.SpokeMutableFeatureGate.SetFromMap(map[string]bool{
 			string(ocmfeature.MultipleHubs): true,
-		})
+		})).NotTo(HaveOccurred())
 
 		var err error
 		suffix = rand.String(5)
@@ -89,15 +89,15 @@ var _ = Describe("switch-hub", Ordered, func() {
 
 	AfterEach(func() {
 		// stop hubs
-		hub1.env.Stop()
-		hub2.env.Stop()
+		Expect(hub1.env.Stop()).NotTo(HaveOccurred())
+		Expect(hub2.env.Stop()).NotTo(HaveOccurred())
 
 		// stop spoke
 		spokeCancel()
 
-		features.SpokeMutableFeatureGate.SetFromMap(map[string]bool{
+		Expect(features.SpokeMutableFeatureGate.SetFromMap(map[string]bool{
 			string(ocmfeature.MultipleHubs): false,
-		})
+		})).NotTo(HaveOccurred())
 	})
 
 	Context("Hub1 doesn't accept client", func() {
@@ -126,7 +126,7 @@ var _ = Describe("switch-hub", Ordered, func() {
 	Context("Hub1 is down and timeout", func() {
 		It("Should switch to hub2", func() {
 			// Stop hub1
-			hub1.env.Stop()
+			Expect(hub1.env.Stop()).NotTo(HaveOccurred())
 
 			// The timeoutSeconds is 10s, so we need to wait for 30s to make sure the agent is restarted
 			time.Sleep(30 * time.Second)
