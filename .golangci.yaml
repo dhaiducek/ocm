@@ -92,8 +92,13 @@ linters:
       - std-error-handling
       - common-false-positives
       - legacy
-    paths:
-      - ".*_test\\.go"
+    rules:
+      # Remove this once the API module ships NewClientset and 
+      # tests move to the field-managed tracker.
+      - linters:
+          - staticcheck
+        path: _test\.go$|^test/
+        text: NewSimpleClientset is deprecated
     # # Excluding configuration per-path, per-linter, per-text and per-source.
     # rules:
     #   # Exclude some linters from running on tests files.
