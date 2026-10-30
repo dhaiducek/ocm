@@ -100,14 +100,14 @@ func TestConcurrentRemoveAndGet(t *testing.T) {
 	caches := NewExecutorCache()
 	executor := "test-executor"
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		d := Dimension{Name: fmt.Sprintf("%d", i)}
 		caches.Upsert(executor, d, nil)
 	}
 
 	wg := sync.WaitGroup{}
 	wg.Add(200)
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		go func(i int) {
 			defer wg.Done()
 			d := Dimension{Name: fmt.Sprintf("%d", i)}
@@ -138,21 +138,21 @@ func TestConcurrentGetCacheItemsWhileModifying(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(30)
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		go func() {
 			defer wg.Done()
 			caches.Count()
 		}()
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(i int) {
 			defer wg.Done()
 			caches.Upsert(fmt.Sprintf("new-%d", i), Dimension{Name: "test"}, nil)
 		}(i)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(i int) {
 			defer wg.Done()
 			d := Dimension{Name: fmt.Sprintf("%d", 0)}
@@ -166,15 +166,15 @@ func TestConcurrentGetCacheItemsWhileModifying(t *testing.T) {
 func TestConcurrentCleanupUnnecessaryCaches(t *testing.T) {
 	caches := NewExecutorCache()
 
-	for i := 0; i < 20; i++ {
+	for i := range 20 {
 		for j := 0; j < 10; j++ {
 			caches.Upsert(fmt.Sprintf("%d", i), Dimension{Name: fmt.Sprintf("%d", j)}, nil)
 		}
 	}
 
 	necessaryCaches := NewExecutorCache()
-	for i := 0; i < 10; i++ {
-		for j := 0; j < 5; j++ {
+	for i := range 10 {
+		for j := range 5 {
 			necessaryCaches.Upsert(fmt.Sprintf("%d", i), Dimension{Name: fmt.Sprintf("%d", j)}, nil)
 		}
 	}
@@ -187,7 +187,7 @@ func TestConcurrentCleanupUnnecessaryCaches(t *testing.T) {
 		caches.CleanupUnnecessaryCaches(necessaryCaches)
 	}()
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(i int) {
 			defer wg.Done()
 			executor := fmt.Sprintf("%d", i)
